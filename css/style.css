@@ -17,55 +17,50 @@ body{
     font-family: "Mustica";
 }
 
-nav{
+.container{
+    max-width: 1280px;
+    margin: 0 auto;
     display: flex;
-    justify-content: space-around;
-    width: 100%;
-    margin: auto;
     align-items: center;
-    background-color: black;
-    border-bottom: 2px solid black;
-    background-size: cover;
-    font-family: 'Mustica';
-    text-transform: uppercase;
-    min-height: 10vh;
+    justify-content: space-between;
 }
 
-.naslov h2{
+nav {
+    align-items: center;
+    margin: auto;
+    text-transform: uppercase;
+    background-color: black;
+    padding: 16px 32px;
+}
+
+nav h2 {
     color: wheat;
     text-decoration: none;
     font-size: 20px;
     letter-spacing: 1.5px;
 }
 
-.nav_links{
-    display: flex;
-    justify-content: space-around;
-    width: 70%;
+.menu {
+    flex: 1 1 1 0%;
+    justify-content: flex-end;
+    margin: 0 -16px;
 }
 
-.nav_links li{
-    list-style: none;
-}
-
-.nav_links a{
+.menu a{
     color: wheat;
     text-decoration: none;
     font-size: 20px;
     letter-spacing: 1.5px;
     background-color: #003595;
+    margin: 20px;
     opacity: 0.8;
     padding: 10px;
     border-radius: 3px;
     transition: background 1s ease;
 }
 
-.nav_links a.active, a.inactive:hover{
+.menu a.is-active, a.is-inactive:hover{
     background-color: #0076FF;
-}
-
-.nav_active{
-    transform: translateX(0%);
 }
 
 .row{
@@ -128,7 +123,7 @@ footer{
     width: 100%;
     padding-top: 5px;
     color: wheat;
-    min-height: 16vh;
+    min-height: 14vh;
 }
   
 .footer-content{
@@ -187,4 +182,40 @@ input[type=button], input[type=submit], input[type=reset] {
     text-decoration: none;
     margin: 4px 2px;
     cursor: pointer;
+}
+
+@media screen and (max-width: 2560px){
+    .row{
+        width: 40%;
+    }
+    .row_2{
+        width: 40%;
+    }
+    .card_image{
+        width: 500px;
+    }
+}
+
+@media screen and (max-width: 1600px){
+    .row{
+        width: 55%;
+    }
+    .row_2{
+        width: 55%;
+    }
+    .card_image{
+        width: 350px;
+    }
+}
+
+@media screen and (max-width: 900px){
+    .row{
+        width: 65%;
+    }
+    .row_2{
+        width: 65%;
+    }
+    .card_image{
+        width: 250px;
+    }
 }
