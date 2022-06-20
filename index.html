@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://d3js.org/d3.v3.js"></script>
+    <script src="https://d3js.org/d3.v4.js"></script>
     <link rel="stylesheet" href="css/style.css">
     <title>Čobanac</title>
 </head>
@@ -52,30 +52,34 @@
     </div>
 
     <script>
-        var data = 
-        [{"naziv" : "Srnetina", "vrijednost" : 125},
-        {"naziv" : "Junetina", "vrijednost" : 10},
-        {"naziv" : "Svinjetina", "vrijednost" : 15},
-        {"naziv" : "Luk", "vrijednost" : 20},
-        {"naziv" : "Mrkva", "vrijednost" : 25},
-        {"naziv" : "Peršin", "vrijednost" : 30},
-        {"naziv" : "Celer", "vrijednost" : 50},
-        {"naziv" : "Mljevena paprika", "vrijednost" : 70},
-        {"naziv" : "Svinjska mast", "vrijednost" : 60},
-        {"naziv" : "Pasirana rajčica", "vrijednost" : 20}
+        var data1 = 
+        [{"naziv" : "Srnetina", "vrijednost" : 158},
+        {"naziv" : "Junetina", "vrijednost" : 142},
+        {"naziv" : "Svinjetina", "vrijednost" : 161},
+        {"naziv" : "Luk", "vrijednost" : 40},
+        {"naziv" : "Mrkva", "vrijednost" : 42},
+        {"naziv" : "Peršin", "vrijednost" : 55},
+        {"naziv" : "Celer", "vrijednost" : 23},
+        {"naziv" : "Mljevena paprika", "vrijednost" : 282},
+        {"naziv" : "Svinjska mast", "vrijednost" : 885},
+        {"naziv" : "Pasirana rajčica", "vrijednost" : 25}
         ];
 
-        var margin = {
+        var colors1 = ["#9C1010", "#E12C2C", "#FC6262", "#F5FC62", "#F98300",
+                "#0B970A", "#74F473", "#C53103", "#FFFFD9", "#FF0000"];
+
+        var margin1 = {
             top: 40,
             bottom: 70,
             left: 70,
             right: 20
         };
 
-        var tooltip = d3.select("#kalorije")
+        var tooltip1 = d3.select("#kalorije")
             .append("div")
             .style("opacity", 0)
             .attr("class", "tooltip")
+            .style("display", "inline")
             .style("background-color", "rgb(255,255,255,0.5)")
             .style("border", "solid")
             .style("border-width", "1px")
@@ -83,136 +87,125 @@
             .style("padding", "5px")
 
         var mouseover = function(d) {
-            tooltip
+            tooltip1
             .style("opacity", 1)
         }
 
         var mousemove = function(d) {
-            tooltip
+            tooltip1
             .html("Kalorijska vrijednost sastojka '" + d.naziv + "' po 100g: " + d.vrijednost + " kcal")
-            .style("left", (d3.mouse(this)[0]+90) + "px")
-            .style("top", (d3.mouse(this)[1]) + "px")
         }
 
         var mouseleave = function(d) {
-            tooltip
+            tooltip1
             .transition()
-            .duration(200)
+            .duration(400)
             .style("opacity", 0)
         }
 
-        var width = 500 - margin.left - margin.right;
-        var height = 500 - margin.top - margin.bottom;
-        var barPadding = 10;
-        var barWidth = width / data.length - barPadding;
+        var width1 = 500 - margin1.left - margin1.right;
+        var height1 = 500 - margin1.top - margin1.bottom;
+        var barPadding1 = 0;
+        var barWidth1 = width1 / data1.length - barPadding1;
 
-        var x = d3.scale.ordinal()    
-            .domain(d3.range(data.length))
-            .rangeRoundBands([0, width]);
+        var x1 = d3.scaleBand()    
+            .domain(d3.range(data1.length))
+            .rangeRound([0, width1]);
 
-        var y = d3.scale.linear()
-            .domain([0, d3.max(data, function(d) {
+        var y1 = d3.scaleLinear()
+            .domain([0, d3.max(data1, function(d) {
                 return d.vrijednost;
             })])
-            .range([height, 0]);
+            .range([height1, 0]);
 
-        var svg = d3.select("#kalorije")
+        var svg1 = d3.select("#kalorije")
             .append("svg")
-                .attr("width", width + margin.left + margin.right + 150)
-                .attr("height", height + margin.bottom + margin.top)
+                .attr("width", width1 + margin1.left + margin1.right + 150)
+                .attr("height", height1 + margin1.bottom + margin1.top)
                 .style("background-color", "transparent")
                 .append("g")
-                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+                .attr("transform", "translate(" + margin1.left + "," + margin1.top + ")");
 
-        var xAxis = d3.svg.axis()
-            .scale(x)
-            .orient("bottom")
+        var xAxis1 = d3.axisBottom(x1)
             .tickFormat(function(d, i) {
-                return "";
+                return data1[i].naziv;
             });
 
-        var yAxis = d3.svg.axis()
-            .scale(y)
-            .orient("left")
-            .ticks(10);
+        var yAxis1 = d3.axisLeft(y1);
 
-        var colors = d3.scale.ordinal()
-            .domain(data - 1)
-            .range(["#9C1010", "#E12C2C", "#FC6262", "#F5FC62", "#F98300",
-                "#0B970A", "#74F473", "#C53103", "#FFFFD9", "#FF0000"]);
-
-        svg.append("g")
-            .attr("class", "x axis")
-            .attr("transform", "translate(0," + height + ")")
-            .call(xAxis)
+        svg1.append("g")
+            .attr("transform", "translate(0," + height1 + ")")
+            .call(xAxis1)
             .selectAll("text")
-            .style("text-anchor", "middle");
-        svg.append("text")
-            .attr("x", (width / 2))
-            .attr("y", -(margin.top / 2))
-            .attr("font-weight", "bold")
+            .style("text-anchor", "end")
+            .attr("transform", "rotate(-45)");
+
+        svg1.append("text")
+            .attr("x", width1/2)
+            .attr("y", "-15px")
+            .attr("text-anchor", "middle")
             .style("font-size", "20px")
-            .style("text-anchor", "middle")
             .text("Kalorijska vrijednost sastojka (100g)");
-        svg.append("g")
-            .attr("class", "y axis")
-            .call(yAxis)
-            .append("text")
-                .attr("transform", "rotate(-90)")
-                .attr("x", -(height / 2))
-                .attr("y", -((margin.left / 2) + 20))
-                .style("text-anchor", "middle")
-                .style("font-size", "20px")
-                .text("Kcal")
-        svg.append("text")
-            .attr("x", (width / 2))
-            .attr("y", (height + (margin.bottom / 2)))
-            .attr("dy", "1em")
+
+        svg1.append("text")             
+            .attr("transform", "translate(" + (width1/2) + " ," + (height1 + margin1.top + 20) + ")")
             .style("text-anchor", "middle")
             .style("font-size", "20px")
             .text("Sastojak");
 
-        var barchart1 = svg.selectAll("rects1")
-            .data(data)
+        svg1.append("g")
+            .call(yAxis1);
+
+        svg1.append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("y", 0 - margin1.left)
+            .attr("x", 0 - (height1 / 2))
+            .attr("dy", "1em")
+            .style("text-anchor", "middle")
+            .style("font-size", "20px")
+            .text("Kcal");   
+
+        var barchart1 = svg1.selectAll("rects1")
+            .data(data1)
             .enter()
             .append("rect")
-                .attr("class", "test")
+                .attr("class", "rects1")
                 .attr("x", function(d, i) {
-                    return x(i);
+                    return x1(i);
                 })
                 .attr("y", function(d, i) {
-                    return y(0);
+                    return y1(0);
                 })
                 .attr("height", function(d) {
-                    return height - y(0);
+                    return height1 - y1(0);
                 })
-                .attr("width", barWidth)
+                .attr("width", barWidth1)
                 .attr("fill", function(d, i) {
-                    return colors(i);
+                    return colors1[i];
                 })
                 .on("mouseover", mouseover)
                 .on("mousemove", mousemove)
                 .on("mouseleave", mouseleave);
 
-        var size = 15
-        svg.selectAll("squares")
-            .data(data)
+        var size1 = 15
+        svg1.selectAll("squares1")
+            .data(data1)
             .enter()
             .append("rect")
                 .attr("x", 420)
-                .attr("y", function(d,i){ return 100 + i*(size+5)})
-                .attr("width", size)
-                .attr("height", size)
+                .attr("y", function(d,i){ return 100 + i*(size1+10)})
+                .attr("width", size1)
+                .attr("height", size1)
                 .style("fill", function(d, i) {
-            return colors(i);
+            return colors1[i];
         });
 
-        svg.selectAll("labels")
-            .data(data)
+        svg1.selectAll("labels1")
+            .data(data1)
             .enter()
             .append("text")
-                .attr("x", 420 + size*1.2)
-                .attr("y", function(d,i){ return 100 + i*(size+5) + (size/2)})
+                .attr("x", 420 + size1*1.2)
+                .attr("y", function(d,i){ return 100 + i*(size1+10) + (size1/1.5)})
                 .style("fill", "black")
                 .text(function(d){ return d.naziv})
                 .attr("text-anchor", "left")
@@ -228,7 +221,7 @@
     </div>
 
     <script>
-        var data_porcija = 
+        var data2 = 
         [{"naziv" : "Srnetina", "vrijednost" : 59.5},
         {"naziv" : "Junetina", "vrijednost" : 53.5},
         {"naziv" : "Svinjetina", "vrijednost" : 80.5},
@@ -241,22 +234,26 @@
         {"naziv" : "Pasirana rajčica", "vrijednost" : 0.85}
         ];
 
-        var margin = {
+        var colors2 = ["#9C1010", "#E12C2C", "#FC6262", "#F5FC62", "#F98300",
+                "#0B970A", "#74F473", "#C53103", "#FFFFD9", "#FF0000"];
+
+        var margin2 = {
             top: 40,
             bottom: 70,
             left: 70,
             right: 20
         };
 
-        var width = 500 - margin.left - margin.right;
-        var height = 500 - margin.top - margin.bottom;
-        var barPadding = 10;
-        var barWidth = width / data_porcija.length - barPadding;
+        var width2 = 500 - margin2.left - margin2.right;
+        var height2 = 500 - margin2.top - margin2.bottom;
+        var barPadding2 = 0;
+        var barWidth2 = width2 / data2.length - barPadding2;
 
-        var tooltipSecond = d3.select("#kalorije_porcija")
+        var tooltip2 = d3.select("#kalorije_porcija")
             .append("div")
             .style("opacity", 0)
             .attr("class", "tooltip")
+            .style("display", "inline")
             .style("background-color", "rgb(255,255,255,0.5)")
             .style("border", "solid")
             .style("border-width", "1px")
@@ -264,131 +261,122 @@
             .style("padding", "5px")
 
         var mouseover = function(d) {
-            tooltipSecond
+            tooltip2
             .style("opacity", 1)
         }
 
         var mousemove = function(d) {
-            tooltipSecond
+            tooltip2
             .html("Kalorijska vrijednost sastojka '" + d.naziv + "' po porciji: " + d.vrijednost + " kcal")
-            .style("left", (d3.mouse(this)[0]+90) + "px")
-            .style("top", (d3.mouse(this)[1]) + "px")
         }
 
         var mouseleave = function(d) {
-            tooltipSecond
+            tooltip2
             .transition()
-            .duration(200)
+            .duration(400)
             .style("opacity", 0)
         }
 
-        var x = d3.scale.ordinal()    
-            .domain(d3.range(data_porcija.length))
-            .rangeRoundBands([0, width]);
+        var x2 = d3.scaleBand()    
+            .domain(d3.range(data2.length))
+            .rangeRound([0, width2]);
 
-        var y = d3.scale.linear()
-            .domain([0, d3.max(data_porcija, function(d) {
+        var y2 = d3.scaleLinear()
+            .domain([0, d3.max(data2, function(d) {
                 return d.vrijednost;
             })])
-            .range([height, 0]);
+            .range([height2, 0]);
 
-        var svg = d3.select("#kalorije_porcija")
+        var svg2 = d3.select("#kalorije_porcija")
             .append("svg")
-                .attr("width", width + margin.left + margin.right + 150)
-                .attr("height", height + margin.bottom + margin.top)
+                .attr("width", width2 + margin2.left + margin2.right + 150)
+                .attr("height", height2 + margin2.bottom + margin2.top)
                 .style("background-color", "transparent")
                 .append("g")
-                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+                .attr("transform", "translate(" + margin2.left + "," + margin2.top + ")");
 
-        var xAxis = d3.svg.axis()
-            .scale(x)
-            .orient("bottom")
+        var xAxis2 = d3.axisBottom(x2)
             .tickFormat(function(d, i) {
-                return "";
+                return data2[i].naziv;
             });
 
-        var yAxis = d3.svg.axis()
-            .scale(y)
-            .orient("left")
-            .ticks(10);
+        var yAxis2 = d3.axisLeft(y2);
 
-        var colors = d3.scale.ordinal()
-            .domain(data_porcija - 1)
-            .range(["#9C1010", "#E12C2C", "#FC6262", "#F5FC62", "#F98300",
-                "#0B970A", "#74F473", "#C53103", "#FFFFD9", "#FF0000"]);
-
-        svg.append("g")
-            .attr("class", "x axis")
-            .attr("transform", "translate(0," + height + ")")
-            .call(xAxis)
-            .selectAll("text")
-            .style("text-anchor", "middle");
-        svg.append("text")
-            .attr("x", (width / 2))
-            .attr("y", -(margin.top / 2))
-            .attr("font-weight", "bold")
+        svg2.append("text")
+            .attr("x", width2/2)
+            .attr("y", "-15px")
+            .attr("text-anchor", "middle")
             .style("font-size", "20px")
-            .style("text-anchor", "middle")
-            .text("Kalorijska vrijednost jedne porcije (250ml) = 227kcal");
-        svg.append("g")
-            .attr("class", "y axis")
-            .call(yAxis)
-            .append("text")
-                .attr("transform", "rotate(-90)")
-                .attr("x", -(height / 2))
-                .attr("y", -((margin.left / 2) + 20))
-                .style("text-anchor", "middle")
-                .style("font-size", "20px")
-                .text("Kcal")
-        svg.append("text")
-            .attr("x", (width / 2))
-            .attr("y", (height + (margin.bottom / 2)))
-            .attr("dy", "1em")
+            .text("Kalorijska vrijednost sastojka po porciji (250ml) => 227kcal");
+
+        svg2.append("g")
+            .attr("transform", "translate(0," + height2 + ")")
+            .call(xAxis2)
+            .selectAll("text")
+            .style("text-anchor", "end")
+            .attr("transform", "rotate(-45)");
+
+        svg2.append("text")             
+            .attr("transform",
+                    "translate(" + (width2/2) + " ," + 
+                                (height2 + margin2.top + 20) + ")")
             .style("text-anchor", "middle")
             .style("font-size", "20px")
             .text("Sastojak");
 
-        var barchart2 = svg.selectAll("rects2")
-            .data(data_porcija)
+        svg2.append("g")
+            .call(yAxis2);
+
+        svg2.append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("y", 0 - margin2.left)
+            .attr("x", 0 - (height2 / 2))
+            .attr("dy", "1em")
+            .style("text-anchor", "middle")
+            .style("font-size", "20px")
+            .text("Kcal");  
+
+        var barchart2 = svg2.selectAll("rects2")
+            .data(data2)
             .enter()
             .append("rect")
-                .attr("class", "proba")
+                .attr("class", "rects2")
                 .attr("x", function(d, i) {
-                    return x(i);
+                    return x2(i);
                 })
                 .attr("y", function(d, i) {
-                    return y(0);
+                    return y2(0);
                 })
                 .attr("height", function(d) {
-                    return height - y(0);
+                    return height2 - y2(0);
                 })
-                .attr("width", barWidth)
+                .attr("width", barWidth2)
                 .attr("fill", function(d, i) {
-                    return colors(i);
+                    return colors2[i];
                 })
                 .on("mouseover", mouseover)
                 .on("mousemove", mousemove)
                 .on("mouseleave", mouseleave);
 
-        var size = 15
-        svg.selectAll("squares")
-            .data(data_porcija)
+        var size2 = 15
+        svg2.selectAll("squares2")
+            .data(data2)
             .enter()
             .append("rect")
                 .attr("x", 420)
-                .attr("y", function(d,i){ return 100 + i*(size+5)})
-                .attr("width", size)
-                .attr("height", size)
+                .attr("y", function(d,i){ return 100 + i*(size2+10)})
+                .attr("width", size2)
+                .attr("height", size2)
                 .style("fill", function(d, i) {
-            return colors(i);
+            return colors2[i];
         });
 
-        svg.selectAll("labels")
-            .data(data_porcija)
+        svg2.selectAll("labels2")
+            .data(data2)
             .enter()
             .append("text")
-                .attr("x", 420 + size*1.2)
-                .attr("y", function(d,i){ return 100 + i*(size+5) + (size/2)})
+                .attr("x", 420 + size2*1.2)
+                .attr("y", function(d,i){ return 100 + i*(size2+10) + (size2/1.5)})
                 .style("fill", "black")
                 .text(function(d){ return d.naziv})
                 .attr("text-anchor", "left")
@@ -479,34 +467,34 @@
     }
 
     function prikaziKalorije(){
-        var x = document.getElementById("kalorije");
-        if (x.style.display === "none") {
-            x.style.display = "block";
-            d3.selectAll(".test")
-                .data(data)
+        var x1 = document.getElementById("kalorije");
+        if (x1.style.display === "none") {
+            x1.style.display = "block";
+            d3.selectAll(".rects1")
+                .data(data1)
                 .transition()
                 .duration(800)
-                .attr("y", function(d) { return y(d.vrijednost); })
-                .attr("height", function(d) { return height - y(d.vrijednost); })
+                .attr("y", function(d) { return y1(d.vrijednost); })
+                .attr("height", function(d) { console.log(y1(d.vrijednost)); return height1 - y1(d.vrijednost); })
                 .delay(function(d,i){return(i*100)})
         } else {
-            x.style.display = "none";
+            x1.style.display = "none";
         }
     }
 
     function prikaziKalorijePorcija(){
-        var x = document.getElementById("kalorije_porcija");
-        if (x.style.display === "none") {
-            x.style.display = "block";
-            d3.selectAll(".proba")
-                .data(data_porcija)
+        var x2 = document.getElementById("kalorije_porcija");
+        if (x2.style.display === "none") {
+            x2.style.display = "block";
+            d3.selectAll(".rects2")
+                .data(data2)
                 .transition()
                 .duration(800)
-                .attr("y", function(d) { return y(d.vrijednost); })
-                .attr("height", function(d) { return height - y(d.vrijednost); })
+                .attr("y", function(d) { return y2(d.vrijednost); })
+                .attr("height", function(d) { console.log(y2(d.vrijednost)); return height2 - y2(d.vrijednost); })
                 .delay(function(d,i){return(i*100)})
         } else {
-            x.style.display = "none";
+            x2.style.display = "none";
         }
     }
 </script>
