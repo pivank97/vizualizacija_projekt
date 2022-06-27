@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://d3js.org/d3.v4.js"></script>
+    <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
     <link rel="stylesheet" href="css/style.css">
     <title>Čobanac</title>
 </head>
@@ -29,8 +30,8 @@
         <input type="number" id="number" min="5" max="100" name="number" required>
     </form>
 
-    <div class="form-group-button" style="text-align: center">
-        <button onclick="prikaziSastojke()" class="button" id="toggle_sastojci">Prikaži/Sakrij sastojke</button>
+    <div class="form-group-button" style="text-align: center;">
+        <button onclick="prikaziSastojke()" class="button" id="toggle_sastojci" style="font-family: Mustica">Prikaži/Sakrij sastojke</button>
     </div>
 
     <div class="row">
@@ -44,7 +45,7 @@
     </div>
 
     <div class="form-group-button" style="text-align: center">
-        <button onclick="prikaziKalorije()" class="button" id="toggle_kalorije">Prikaži/Sakrij nominalnu kalorijsku vrijednost</button>
+        <button onclick="prikaziKalorije()" class="button" id="toggle_kalorije" style="font-family: Mustica">Prikaži/Sakrij nominalnu kalorijsku vrijednost</button>
     </div>
 
     <div class="row">
@@ -213,7 +214,7 @@
     </script>
 
     <div class="form-group-button" style="text-align: center">
-        <button onclick="prikaziKalorijePorcija()" class="button" id="toggle_kalorije">Prikaži/Sakrij kalorijsku vrijednost jedne porcije</button>
+        <button onclick="prikaziKalorijePorcija()" class="button" id="toggle_kalorije" style="font-family: Mustica">Prikaži/Sakrij kalorijsku vrijednost jedne porcije</button>
     </div>
 
     <div class="row">
@@ -384,7 +385,98 @@
     </script>
 
     <div class="form-group-button" style="text-align: center">
-        <button onclick="prikaziPostupak()" class="button" id="toggle_postupak">Prikaži/Sakrij postupak</button>
+        <button onclick="prikaziPieChart()" class="button" id="toggle_pie" style="font-family: Mustica">Prikaži/Sakrij nutritivne vrijednosti mesa</button>
+    </div>
+    
+    <div class="row">
+        <div id="pie_chart_buttons" style="text-align: center; display: none;">
+            <button onclick="update(data_pie_1)" style="font-family: Mustica">Srnetina</button>
+            <button onclick="update(data_pie_2)" style="font-family: Mustica">Junetina</button>
+            <button onclick="update(data_pie_3)" style="font-family: Mustica">Svinjetina</button>
+        </div>
+        <div id="pie_chart" style="text-align: center; display: none;"></div>
+    </div>
+
+    <script>
+        var width3 = 450, height3 = 450, margin3 = 40;
+        
+        var radius3 = Math.min(width3, height3) / 2 - margin3
+        
+        var svg3 = d3.select("#pie_chart")
+          .append("svg")
+            .attr("width", width3)
+            .attr("height", height3)
+          .append("g")
+            .attr("transform", "translate(" + width3 / 2 + "," + height3 / 2 + ")");
+        
+        var data_pie_1 = {"proteini" : 22, "masti": 4}
+        var data_pie_2 = {"proteini" : 20, "masti": 9}
+        var data_pie_3 = {"proteini" : 19.6, "masti": 11.2}
+        
+        var colors = d3.scaleOrdinal()
+            .range(["#FF8B37", "#FFF0D7"]);
+
+        function update(data) { 
+            var pie = d3.pie()
+                .value(function(d) { return d.value; })
+                .sort(function(a, b) { return d3.ascending(a.value, b.value);} );
+            var data_ready = pie(d3.entries(data));
+            
+            var arcGenerator = d3.arc()
+                .innerRadius(80)
+                .outerRadius(radius3);
+
+            var u = svg3.selectAll("path")
+                .data(data_ready);
+                
+            u.enter()
+            .append('path')
+                .merge(u)
+                .transition()
+                .duration(1200)
+                .attr('d', arcGenerator)
+                .attr('fill', function(d, i){ return(colors(d.data.key)) })
+                .attr("stroke", "black")
+                .style("stroke-width", "1px")
+                .style("opacity", 1);
+
+            u.exit()
+            .remove();
+
+            var legendRectSize = 15;
+            var legendSpacing = 10;
+            var legend = svg3.selectAll('.legend')
+            .data(colors.domain())
+            .enter()
+            .append('g')
+                .attr('class', 'circle-legend')
+                .attr('transform', function (d, i) {
+                    var heightL = legendRectSize + legendSpacing;
+                    var offset = heightL * colors.domain().length / 2;
+                    var horizontal = -1 * legendRectSize - 13;
+                    var vertical = i * heightL - offset + 10;
+                    return 'translate(' + horizontal + ',' + vertical + ')';
+                });
+            legend.append('circle')
+                .style('fill', colors)
+                .style('stroke', "black")
+                .attr('cx', 0)
+                .attr('cy', 0)
+                .attr('r', '.5rem');
+            legend.append('text')
+            .attr('x', legendRectSize + legendSpacing)
+            .attr('y', legendRectSize - legendSpacing)
+            .text(function (d) {
+                return d;
+            });
+        }
+        
+        update(data_pie_1)
+        
+    </script>
+
+    <div class="form-group-button" style="text-align: center">
+        <button onclick="prikaziPostupak()" class="button" id="toggle_postupak" style="font-family: Mustica">Prikaži/Sakrij postupak</button>
     </div>
 
     <div class="row">
@@ -392,14 +484,29 @@
             <h2>Postupak</h2>
             <img class="card_image" src="images/postupak.jpeg">
             <h3>Priprema</h3>
-            <p> 
+            <p><br> 
                  - sitno isjeckati ili izblendati luk 
                 <br> - naribati ili izblendati mrkvu, korjen peršina i korjen celera
                 <br> - svo meso narezati na kockice jednake veličine
+                <br> - svinjske nogice narezati na pola ili na četvrtine
             </p>
             <h3><br>Postupak kuhanja</h3>
-            <p>
-                - 
+            <p><br>
+                Čobanac se kuha na drvima ili na vatri iz plinske boce. Ukoliko se čobanac radi na veliko (20+ ljudi) bolje je koristiti vatru na plin radi lakše regulacije jačine vatre.
+                <br><br>(1) - na laganoj vatri u kotlić ubaciti svinjsku mast (važno je da kotlić bude suh prije ubacivanja masti), čim se mast krene topiti ubaciti luk. 
+                Luk dinstati na laganoj vatri oko 40 minuta, svakih 10 minuta dolijevati malo mineralne vode kako luk ne bi zagorio i kako bi se brže raspao.
+                <br>(2) - Nakon što se luk izdinstao, zajedno ubaciti mrkvu, korjen celera i korjen peršina. Dinstati na laganoj vatri 30 minuta i svakih 10 minuta dodavati malo mineralne vode.
+                <br>(3) - Nakon dinstanja ubaciti svinjske nogice, uliti malo vode i tako dinstati 20 minuta na malo jačoj vatri no do sad.
+                <br>(4) - Zatim ubaciti meso divljači, malo posoliti tek toliko i dinstati 10 minuta bez dodavanja vode.
+                <br>(5) - Nakon toga uliti vode tek toliko da pokrije meso i tako kuhati cca 45 minuta.
+                <br>(6) - Nakon toga ubaciti junetinu, uliti vode da se pokrije meso i kuhati 30 minuta.
+                <br>(7) - Isto se radi i sa svinjetinom. Ubaciti svinjetinu, uliti vode da se pokrije meso i kuhati 30 minuta.
+                <br>(8) - Nakon toga ulijeva se sva preostala potrebna voda. Ubaciti lovorove listove. Nakon ovoga se voda više ne smije ulijevati, čobanac se treba kuhati još 1 do 1.5 sata na srednje laganoj vatri.
+                <br>(9) - Sat vremena prije kraja kuhanja čobanca ubacuju se začini. Sve začine (papar, sol, ljuta i slatka paprika) potrebno je izmiješati zajedno s pasiranom rajčicom u nekoj posudi, dodavati malo vode kako ne bi bilo pregusto.
+                Po želji ubaciti malo suhe feferone. Nakon što se smjesa začina ubaci u čobanac potrebno je dobro promiješati kako se ne bi zaljepilo za dno kotlića.
+                <br>(10) - Pola sata prije kraja kuhanja ubaciti sol.
+                <br>- Isprobavati slanoću čobanca svakih 5 minuta i po želji dodavati još malo po malo.
+                
             </p>
         </div>
     </div>
@@ -495,6 +602,18 @@
                 .delay(function(d,i){return(i*100)})
         } else {
             x2.style.display = "none";
+        }
+    }
+
+    function prikaziPieChart(){
+        var x = document.getElementById("pie_chart");
+        var y = document.getElementById("pie_chart_buttons");
+        if (x.style.display === "none") {
+            x.style.display = "block";
+            y.style.display = "block";
+        } else {
+            x.style.display = "none";
+            y.style.display = "none";
         }
     }
 </script>
