@@ -390,9 +390,9 @@
     
     <div class="row">
         <div id="pie_chart_buttons" style="text-align: center; display: none;">
-            <button onclick="update(data_pie_1)" style="font-family: Mustica">Srnetina</button>
-            <button onclick="update(data_pie_2)" style="font-family: Mustica">Junetina</button>
-            <button onclick="update(data_pie_3)" style="font-family: Mustica">Svinjetina</button>
+            <button id="srnetina" onclick="update(data_pie_1)" style="font-family: Mustica">Srnetina</button>
+            <button id="junetina" onclick="update(data_pie_2)" style="font-family: Mustica">Junetina</button>
+            <button id="svinjetina" onclick="update(data_pie_3)" style="font-family: Mustica">Svinjetina</button>
         </div>
         <div id="pie_chart" style="text-align: center; display: none;"></div>
     </div>
@@ -416,7 +416,34 @@
         var colors = d3.scaleOrdinal()
             .range(["#FF8B37", "#FFF0D7"]);
 
-        function update(data) { 
+        function update(data) {
+            var srnetina = document.getElementById("srnetina");
+                junetina = document.getElementById("junetina");
+                svinjetina = document.getElementById("svinjetina");
+            
+            srnetina.style.borderWidth='thin';
+            junetina.style.borderWidth='thin';
+            svinjetina.style.borderWidth='thin';
+
+            srnetina.style.padding='0px 5px';
+            junetina.style.padding='0px 5px';
+            svinjetina.style.padding='0px 5px';
+
+            if(data == data_pie_1) {
+                srnetina.style.backgroundColor='#F1F1F1';
+                junetina.style.backgroundColor='#B6B6B6';
+                svinjetina.style.backgroundColor='#B6B6B6';
+            }
+            else if(data == data_pie_2){
+                document.getElementById("srnetina").style.backgroundColor='#B6B6B6';
+                document.getElementById("junetina").style.backgroundColor='#F1F1F1';
+                document.getElementById("svinjetina").style.backgroundColor='#B6B6B6';
+            }
+            else if(data == data_pie_3){
+                document.getElementById("srnetina").style.backgroundColor='#B6B6B6';
+                document.getElementById("junetina").style.backgroundColor='#B6B6B6';
+                document.getElementById("svinjetina").style.backgroundColor='#F1F1F1';
+            }
             var pie = d3.pie()
                 .value(function(d) { return d.value; })
                 .sort(function(a, b) { return d3.ascending(a.value, b.value);} );
